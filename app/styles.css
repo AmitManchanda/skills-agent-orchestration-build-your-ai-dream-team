@@ -1,0 +1,360 @@
+/* Project Pulse: static cards stay readable, without implying interactivity. */
+:root {
+  color-scheme: light;
+  --page: #f4f7fb;
+  --surface: #ffffff;
+  --ink: #14213d;
+  --muted: #475569;
+  --accent: #4338ca;
+  --border: #dce3ee;
+  --card-shadow: 0 4px 18px rgb(20 33 61 / 5%);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background-color: var(--page);
+  line-height: 1.6;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Keep both live messages and any data-dependent hidden elements hidden. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  min-width: 0;
+  background-color: var(--page);
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+.dashboard {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 32px 16px 48px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-header {
+  margin-bottom: 28px;
+  padding-block: 4px 8px;
+}
+
+.dashboard-header h1 {
+  color: var(--ink);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.dashboard-header p {
+  max-width: 68ch;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 1.0625rem;
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  min-width: 0;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 16px;
+  background-color: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.summary-label {
+  color: var(--muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.summary-value {
+  min-width: 0;
+  margin-top: 8px;
+  color: var(--ink);
+  font-size: 2rem;
+  font-weight: 750;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-message {
+  margin-block: 0 24px;
+  padding: 16px 20px;
+  border: 1px solid var(--border);
+  border-inline-start: 4px solid var(--accent);
+  border-radius: 12px;
+  color: var(--muted);
+  background-color: var(--surface);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.dashboard-message--error {
+  border-color: #fecaca;
+  border-inline-start-color: #991b1b;
+  color: #991b1b;
+  background-color: #fef2f2;
+}
+
+/* An emptied status region keeps its DOM presence without an empty panel. */
+.dashboard-message:empty {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dashboard-projects {
+  min-width: 0;
+}
+
+.dashboard-projects > h2 {
+  margin-bottom: 18px;
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 24px;
+  min-width: 0;
+}
+
+.project-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background-color: var(--surface);
+  box-shadow: var(--card-shadow);
+  overflow-wrap: anywhere;
+}
+
+.project-card__header {
+  min-width: 0;
+}
+
+.project-card__title {
+  color: var(--ink);
+  font-size: 1.1875rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+.project-card__summary {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.project-card__meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  margin-block: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.project-card__meta-item,
+.project-card__meta-item dd {
+  min-width: 0;
+}
+
+.project-card__meta-item dt,
+.project-card__activity-label {
+  color: var(--muted);
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.project-card__meta-item dd {
+  margin-top: 5px;
+  color: var(--ink);
+  font-size: 0.9375rem;
+}
+
+.status-badge,
+.priority-badge {
+  display: inline-block;
+  min-width: 0;
+  max-width: 100%;
+  padding: 4px 10px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  color: #334155;
+  background-color: #f1f5f9;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.5;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  vertical-align: middle;
+}
+
+/* Priority is separate from risk; both always retain visible text labels. */
+.priority-badge {
+  border-radius: 999px;
+}
+
+.status-badge--in-progress {
+  color: #1e40af;
+  background-color: #eff6ff;
+}
+
+.status-badge--at-risk {
+  color: #92400e;
+  background-color: #fffbeb;
+}
+
+.status-badge--blocked {
+  color: #991b1b;
+  background-color: #fef2f2;
+}
+
+.status-badge--complete {
+  color: #166534;
+  background-color: #f0fdf4;
+}
+
+.status-badge--neutral {
+  color: #334155;
+  background-color: #f1f5f9;
+}
+
+.priority-badge--high {
+  color: #5b21b6;
+  background-color: #f5f3ff;
+}
+
+.priority-badge--medium {
+  color: #334155;
+  background-color: #e2e8f0;
+}
+
+.priority-badge--low {
+  color: #475569;
+  background-color: #f1f5f9;
+}
+
+.priority-badge--neutral {
+  color: #334155;
+  background-color: #f1f5f9;
+}
+
+.project-card__activity {
+  min-width: 0;
+  margin-top: auto;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: var(--page);
+}
+
+.project-card__activity-text {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+/* Only genuine links receive interactive affordances. */
+.dashboard a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.dashboard a:hover {
+  text-decoration-thickness: 0.16em;
+}
+
+.dashboard a:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (min-width: 640px) {
+  .dashboard {
+    padding: 48px 24px 64px;
+  }
+
+  .dashboard-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard {
+    padding-inline: 32px;
+  }
+
+  .project-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* System colors preserve meaning and visible outlines in high-contrast mode. */
+@media (forced-colors: active) {
+  .summary-item,
+  .project-card,
+  .project-card__activity,
+  .dashboard-message {
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+
+  .status-badge,
+  .priority-badge {
+    border-color: CanvasText;
+    color: CanvasText;
+    background-color: Canvas;
+  }
+
+  .dashboard a {
+    color: LinkText;
+  }
+
+  .dashboard a:focus-visible {
+    outline-color: Highlight;
+  }
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Project Pulse</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="dashboard-header">
+      <h1>Project Pulse</h1>
+      <p>Explore demonstration project data: see ownership, progress, priorities, and ways to contribute. These sample projects are not live team updates.</p>
+    </header>
+    <dl class="dashboard-summary">
+      <div class="summary-item">
+        <dt class="summary-label">Total projects</dt>
+        <dd class="summary-value" id="total-count">Not loaded</dd>
+      </div>
+      <div class="summary-item">
+        <dt class="summary-label">Active</dt>
+        <dd class="summary-value" id="active-count">Not loaded</dd>
+      </div>
+      <div class="summary-item">
+        <dt class="summary-label">Needs attention</dt>
+        <dd class="summary-value" id="attention-count">Not loaded</dd>
+      </div>
+    </dl>
+    <p class="dashboard-message" id="load-status" role="status" aria-live="polite" aria-atomic="true">Project data has not been loaded.</p>
+    <div class="dashboard-message dashboard-message--error" id="load-error" role="alert" hidden></div>
+    <noscript>
+      <p class="dashboard-message">JavaScript is required to load project data. Enable JavaScript and open the served preview using Run Project Pulse Dashboard in VS Code, rather than opening this file directly.</p>
+    </noscript>
+    <section class="dashboard-projects" aria-labelledby="projects-heading">
+      <h2 id="projects-heading">Projects</h2>
+      <div class="project-grid" id="project-grid"></div>
+    </section>
+  </main>
+  <script>
+    "use strict";
+
+    const statusModifiers = new Map([
+      ["In progress", "in-progress"],
+      ["At risk", "at-risk"],
+      ["Blocked", "blocked"],
+      ["Complete", "complete"]
+    ]);
+    const priorityModifiers = new Map([
+      ["High", "high"],
+      ["Medium", "medium"],
+      ["Low", "low"]
+    ]);
+    const activeStatuses = new Set(["In progress", "At risk", "Blocked"]);
+    const attentionStatuses = new Set(["At risk", "Blocked"]);
+    const loadStatus = document.getElementById("load-status");
+    const loadError = document.getElementById("load-error");
+    const projectGrid = document.getElementById("project-grid");
+
+    function createElement(tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      if (text !== undefined) element.textContent = text;
+      return element;
+    }
+
+    function validateData(data) {
+      if (data === null || typeof data !== "object" || Array.isArray(data)) {
+        throw new Error("Data validation failed: the root must be an object.");
+      }
+      if (!Array.isArray(data.projects)) {
+        throw new Error("Data validation failed: projects must be an array.");
+      }
+      const requiredFields = ["name", "owner", "status", "recentActivity", "priority"];
+      data.projects.forEach((project, index) => {
+        if (project === null || typeof project !== "object" || Array.isArray(project)) {
+          throw new Error(`Data validation failed: project ${index + 1} must be an object.`);
+        }
+        for (const field of requiredFields) {
+          if (typeof project[field] !== "string" || project[field].trim() === "") {
+            throw new Error(`Data validation failed: project ${index + 1}, ${field} must be a nonempty string.`);
+          }
+        }
+        if (project.summary !== undefined && typeof project.summary !== "string") {
+          throw new Error(`Data validation failed: project ${index + 1}, summary must be a string when provided.`);
+        }
+      });
+      return data.projects;
+    }
+
+    function addMetadata(list, label, value, badgeClass, modifiers) {
+      const item = createElement("div", "project-card__meta-item");
+      item.append(createElement("dt", "", label));
+      const definition = createElement("dd");
+      if (badgeClass) {
+        const modifier = modifiers.get(value) || "neutral";
+        definition.append(createElement("span", `${badgeClass} ${badgeClass}--${modifier}`, value));
+      } else {
+        definition.textContent = value;
+      }
+      item.append(definition);
+      list.append(item);
+    }
+
+    function renderProjects(projects) {
+      const cards = document.createDocumentFragment();
+      projects.forEach((project, index) => {
+        const card = createElement("article", "project-card");
+        const titleId = `project-title-${index}`;
+        card.setAttribute("aria-labelledby", titleId);
+        const header = createElement("header", "project-card__header");
+        const title = createElement("h3", "project-card__title", project.name);
+        title.id = titleId;
+        header.append(title);
+        const summary = project.summary && project.summary.trim()
+          ? project.summary
+          : `${project.name} is owned by ${project.owner}. Status: ${project.status}. Priority: ${project.priority}.`;
+        const metadata = createElement("dl", "project-card__meta");
+        addMetadata(metadata, "Owner", project.owner);
+        addMetadata(metadata, "Status", project.status, "status-badge", statusModifiers);
+        addMetadata(metadata, "Priority", project.priority, "priority-badge", priorityModifiers);
+        const activity = createElement("div", "project-card__activity");
+        activity.append(
+          createElement("p", "project-card__activity-label", "Recent activity"),
+          createElement("p", "project-card__activity-text", project.recentActivity)
+        );
+        card.append(header, createElement("p", "project-card__summary", summary), metadata, activity);
+        cards.append(card);
+      });
+      projectGrid.replaceChildren(cards);
+      document.getElementById("total-count").textContent = String(projects.length);
+      document.getElementById("active-count").textContent = String(projects.filter(project => activeStatuses.has(project.status)).length);
+      document.getElementById("attention-count").textContent = String(projects.filter(project => attentionStatuses.has(project.status)).length);
+      loadStatus.textContent = projects.length === 0
+        ? "No projects to display."
+        : `${projects.length} demonstration projects loaded.`;
+    }
+
+    function showError(message) {
+      loadStatus.textContent = "";
+      loadError.textContent = `${message} Check project-data.json and the preview server, then reload the page.`;
+      loadError.hidden = false;
+    }
+
+    async function loadProjects() {
+      if (window.location.protocol === "file:") {
+        showError("Project data requires a served preview. Use Run Project Pulse Dashboard in VS Code to open http://localhost:5500/index.html.");
+        return;
+      }
+      loadStatus.textContent = "Loading demonstration projects...";
+      const controller = new AbortController();
+      let timedOut = false;
+      const timeout = window.setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, 10000);
+      try {
+        let response;
+        let body;
+        try {
+          response = await fetch("project-data.json", { signal: controller.signal });
+          if (!response.ok) {
+            throw new Error(`Project data request failed: HTTP ${response.status}${response.statusText ? ` ${response.statusText}` : ""}.`);
+          }
+          body = await response.text();
+        } catch (error) {
+          if (timedOut) throw new Error("Project data request timed out after 10 seconds.");
+          if (response && !response.ok) throw error;
+          throw new Error("Network error: project data could not be downloaded.");
+        }
+        let data;
+        try {
+          data = JSON.parse(body);
+        } catch (error) {
+          throw new Error("JSON parsing failed: project-data.json is not valid JSON.");
+        }
+        renderProjects(validateData(data));
+      } catch (error) {
+        showError(error.message);
+      } finally {
+        window.clearTimeout(timeout);
+      }
+    }
+
+    loadProjects();
+  </script>
+</body>
+</html>

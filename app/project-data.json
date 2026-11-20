@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Contributor welcome kit",
+      "owner": "Demo onboarding team",
+      "status": "In progress",
+      "recentActivity": "Drafted the first contributor checklist and collected review notes.",
+      "priority": "High",
+      "summary": "Make first contributions easier. Review the draft checklist for unclear steps."
+    },
+    {
+      "name": "Accessible dashboard patterns",
+      "owner": "Demo design team",
+      "status": "At risk",
+      "recentActivity": "Identified contrast issues; the review schedule needs confirmation.",
+      "priority": "Medium",
+      "summary": "Document accessible UI patterns. Help review status labels and reading order."
+    },
+    {
+      "name": "Sample data guide",
+      "owner": "Demo documentation team",
+      "status": "Blocked",
+      "recentActivity": "Outlined the guide; awaiting agreement on example field descriptions.",
+      "priority": "High",
+      "summary": "Explain the demonstration data schema. Suggest clearer field descriptions for review."
+    },
+    {
+      "name": "Project archive cleanup",
+      "owner": "Demo maintenance team",
+      "status": "Complete",
+      "recentActivity": "Finished organizing the sample archive and checked its index.",
+      "priority": "Low",
+      "summary": "Keep completed examples easy to find. Read the archive index for project context."
+    }
+  ]
+}
